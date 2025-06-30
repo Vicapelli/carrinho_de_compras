@@ -24,12 +24,13 @@ class CartsController < ApplicationController
   end
 
   def remove_product
-    product = Product.find(item_params[:product_id])
-    cart_item = @cart.cart_items.find_by(product: product)
+    render json: { error: "Cart not found" }, status: :not_found and return unless @cart
+
+    cart_item = @cart.cart_items.find_by(product_id: item_params[:product_id])
     render json: { error: 'Product not listed in cart' }, status: :not_found and return unless cart_item
 
     cart_item.destroy
-    render json: { response: 'Product removed' }, status: :ok
+    render json: cart_response, status: :ok
   end
 
   private

@@ -4,10 +4,8 @@ module HandlesCartItems
   private
 
   def add_or_update_cart_item(product_id, quantity)
-    product = Product.find(params[:product_id])
     quantity = params[:quantity].to_i
-
-    cart_item = @cart.cart_items.find_or_initialize_by(product: product)
+    cart_item = @cart.cart_items.find_or_initialize_by(product_id: product_id)
     cart_item.quantity ||= 0
     cart_item.quantity += quantity
     cart_item.save!
