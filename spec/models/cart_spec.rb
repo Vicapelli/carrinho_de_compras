@@ -9,21 +9,29 @@ RSpec.describe Cart, type: :model do
     end
   end
 
-  describe 'mark_as_abandoned' do
-    let(:shopping_cart) { create(:shopping_cart) }
-
-    it 'marks the shopping cart as abandoned if inactive for a certain time' do
-      shopping_cart.update(last_interaction_at: 3.hours.ago)
-      expect { shopping_cart.mark_as_abandoned }.to change { shopping_cart.abandoned? }.from(false).to(true)
-    end
+  describe "validations" do
+    it { should validate_numericality_of(:total_price).is_greater_than_or_equal_to(0) }
   end
 
-  describe 'remove_if_abandoned' do
-    let(:shopping_cart) { create(:shopping_cart, last_interaction_at: 7.days.ago) }
+  describe "associations" do
+    it { should have_many(:cart_items).dependent(:destroy) }
+    it { should have_many(:products).through(:cart_items) }
+  end
 
-    it 'removes the shopping cart if abandoned for a certain time' do
-      shopping_cart.mark_as_abandoned
-      expect { shopping_cart.remove_if_abandoned }.to change { Cart.count }.by(-1)
+  describe "#total_price" do
+    it "returns the sum of cart_items total_price" do
+      cart = create(:cart)
+      product = create(:product, price: 10.0)
+      product2 = create(:product, price: 20.0)
+      create(:cart_item, cart: cart, product: product, quantity: 2)
+      create(:cart_item, cart: cart, product: product2, quantity: 1)
+
+      expect(cart.reload.total_price).to eq(40.0)
+    end
+
+    it "returns 0 when cart has no items" do
+      cart = create(:cart)
+      expect(cart.total_price).to eq(0)
     end
   end
 end

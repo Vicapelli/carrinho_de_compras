@@ -20,4 +20,17 @@ RSpec.describe Product, type: :model do
       expect(product.errors[:price]).to include("must be greater than or equal to 0")
     end
   end
+
+  # Usando shoulda-matchers
+  describe "validations" do
+    it { should validate_presence_of(:name) }
+    it { should validate_presence_of(:price) }
+    it { should validate_numericality_of(:price).is_greater_than_or_equal_to(0) }
+  end
+
+  describe "associations" do
+    it { should have_many(:cart_items) }
+    it { should have_many(:carts).through(:cart_items) }
+  end
+
 end
