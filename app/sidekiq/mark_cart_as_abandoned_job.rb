@@ -14,7 +14,7 @@ class MarkCartAsAbandonedJob
     Cart.where(abandoned_at: nil)
         .where("updated_at < ?", 3.hours.ago)
         .find_each do |cart|
-      cart.update_column(:abandoned_at, Time.current)
+      cart.update(abandoned_at: Time.current)
     end
   end
 
